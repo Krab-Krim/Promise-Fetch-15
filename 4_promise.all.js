@@ -1,4 +1,6 @@
 const TODOS_URL = 'https://jsonplaceholder.typicode.com/users';
+const todoIds = [5, 6, 2, 1];
+const dataConainer = document.querySelector('#data-container');
 
 const createTodoElement = (text) => {
     const todoElem = document.createElement('li'),
@@ -9,6 +11,24 @@ const createTodoElement = (text) => {
     todoElem.append(todoElementAnchor);
 
     return todoElem;
+}
+
+const getUsersByIds = (ids) => {
+    const request = ids.map((id) => fetch(`${TODOS_URL}/${id}`));
+    Promise.all(request)
+        .then((responses) => {
+            const dataResults = responses.map((response) => response.json());
+            return Promise.all(dataResults);
+        })
+        .then((todos) => {
+            todos.forEach((todo) => {
+                const todoHTML = createTodoElement(todo.name);
+                dataConainer.append(todoHTML);
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+        })
 }
 
 const toggleLoader = () => {
@@ -49,4 +69,4 @@ const getAllTodos = () => {
         })
 }
 
-getAllTodos();
+getUsersByIds(todoIds);
